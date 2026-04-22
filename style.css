@@ -1,0 +1,1084 @@
+/* ============================================================
+   CYCLES OF SOUND — Ngo Tuan Khoi
+   Shared stylesheet · style.css
+   ============================================================
+
+   TABLE OF CONTENTS
+   1.  Reset & Variables
+   2.  Base & Body
+   3.  Noise Overlay
+   4.  Custom Cursor
+   5.  Navigation
+   6.  Footer
+   7.  Animations & Scroll Reveal
+   8.  Shared Section Primitives
+   9.  Shared Card / Grid Patterns
+   10. index.html — Hero
+   11. index.html — Heartbeat Visualiser
+   12. index.html — Sources Grid
+   13. index.html — DNA Section
+   14. index.html — Music Section
+   15. index.html — Installation Section
+   16. index.html — Goals Section
+   17. statement.html — Page Header
+   18. statement.html — Article / Sidebar Layout
+   19. statement.html — Article Typography
+   20. statement.html — Video Embed
+   21. statement.html — Sidebar Components
+   22. Responsive
+   ============================================================ */
+
+
+/* ── 1. RESET & VARIABLES ─────────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --black:        #060608;
+  --deep:         #0a0a0f;
+  --green:        #2d7a4f;
+  --green-bright: #3daf6e;
+  --green-glow:   rgba(61, 175, 110, 0.12);
+  --white:        #e8e4dc;
+  --muted:        #7a7870;
+  --mono:         'Space Mono', monospace;
+  --serif:        'Cormorant Garamond', serif;
+}
+
+
+/* ── 2. BASE & BODY ───────────────────────────────────────── */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background:   var(--black);
+  color:        var(--white);
+  font-family:  var(--serif);
+  font-size:    18px;
+  line-height:  1.7;
+  overflow-x:   hidden;
+  cursor:       none;
+}
+
+
+/* ── 3. NOISE OVERLAY ─────────────────────────────────────── */
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.4;
+}
+
+
+/* ── 4. CUSTOM CURSOR ─────────────────────────────────────── */
+
+.cursor {
+  position:      fixed;
+  width:         8px;
+  height:        8px;
+  background:    var(--green-bright);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index:       9999;
+  transform:     translate(-50%, -50%);
+  transition:    width 0.2s, height 0.2s, opacity 0.2s;
+  mix-blend-mode: screen;
+}
+
+.cursor-ring {
+  position:      fixed;
+  width:         36px;
+  height:        36px;
+  border:        1px solid rgba(61, 175, 110, 0.5);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index:       9998;
+  transform:     translate(-50%, -50%);
+  transition:    all 0.12s ease;
+}
+
+
+/* ── 5. NAVIGATION ────────────────────────────────────────── */
+
+nav {
+  position:   fixed;
+  top: 0; left: 0; right: 0;
+  z-index:    500;
+  display:    flex;
+  align-items: center;
+  justify-content: space-between;
+  padding:    1.5rem 3rem;
+  background: linear-gradient(to bottom, rgba(6,6,8,0.97) 0%, transparent 100%);
+}
+
+.nav-logo {
+  font-family:     var(--mono);
+  font-size:       0.7rem;
+  letter-spacing:  0.2em;
+  color:           var(--green-bright);
+  text-transform:  uppercase;
+  text-decoration: none;
+}
+
+.nav-links {
+  display:    flex;
+  gap:        2.5rem;
+  list-style: none;
+}
+
+.nav-links a {
+  font-family:     var(--mono);
+  font-size:       0.65rem;
+  letter-spacing:  0.2em;
+  color:           var(--muted);
+  text-decoration: none;
+  text-transform:  uppercase;
+  transition:      color 0.3s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--green-bright);
+}
+
+
+/* ── 6. FOOTER ────────────────────────────────────────────── */
+
+footer {
+  padding:     3rem 10vw;
+  border-top:  1px solid rgba(61, 175, 110, 0.1);
+  display:     flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.footer-name {
+  font-family:  var(--serif);
+  font-size:    1.1rem;
+  font-weight:  300;
+}
+
+.footer-meta {
+  font-family:    var(--mono);
+  font-size:      0.55rem;
+  letter-spacing: 0.2em;
+  color:          var(--muted);
+  text-transform: uppercase;
+  text-align:     right;
+}
+
+
+/* ── 7. ANIMATIONS & SCROLL REVEAL ───────────────────────── */
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 1; }
+}
+
+.reveal {
+  opacity:    0;
+  transform:  translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.reveal.visible {
+  opacity:   1;
+  transform: translateY(0);
+}
+
+
+/* ── 8. SHARED SECTION PRIMITIVES ─────────────────────────── */
+
+section {
+  padding:  7rem 10vw;
+  position: relative;
+}
+
+.section-label {
+  font-family:    var(--mono);
+  font-size:      0.6rem;
+  letter-spacing: 0.3em;
+  color:          var(--green-bright);
+  text-transform: uppercase;
+  margin-bottom:  1rem;
+  display:        flex;
+  align-items:    center;
+  gap:            1rem;
+}
+
+.section-label::after {
+  content:    '';
+  flex:       1;
+  max-width:  60px;
+  height:     1px;
+  background: var(--green);
+}
+
+h2.section-title {
+  font-family:   var(--serif);
+  font-weight:   300;
+  font-size:     clamp(2.2rem, 5vw, 4rem);
+  line-height:   1.1;
+  margin-bottom: 2.5rem;
+}
+
+h2.section-title em {
+  font-style: italic;
+  color:      var(--green-bright);
+}
+
+
+/* ── 9. SHARED CARD / GRID PATTERNS ──────────────────────── */
+
+/* 1px-gap grid used by sources and install sections */
+.gap-grid {
+  display:    grid;
+  gap:        1px;
+  background: rgba(61, 175, 110, 0.1);
+  border:     1px solid rgba(61, 175, 110, 0.1);
+  margin-top: 3rem;
+}
+
+.gap-grid-cell {
+  background:  var(--deep);
+  padding:     2.5rem 2rem;
+  transition:  background 0.3s;
+}
+
+.gap-grid-cell:hover {
+  background: rgba(61, 175, 110, 0.05);
+}
+
+
+/* ── 10. INDEX — HERO ─────────────────────────────────────── */
+
+#hero {
+  min-height:     100vh;
+  display:        flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items:    flex-start;
+  padding:        0 10vw;
+  position:       relative;
+  overflow:       hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 80% 50%, rgba(45, 122, 79, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 20% 80%, rgba(45, 122, 79, 0.05) 0%, transparent 60%);
+}
+
+.waveform-bg {
+  position: absolute;
+  bottom:   15%;
+  left: 0; right: 0;
+  height:   120px;
+  opacity:  0.12;
+}
+
+.hero-eyebrow {
+  font-family:    var(--mono);
+  font-size:      0.65rem;
+  letter-spacing: 0.3em;
+  color:          var(--green-bright);
+  text-transform: uppercase;
+  margin-bottom:  2rem;
+  animation:      fadeUp 1s ease both;
+}
+
+h1.hero-title {
+  font-family:    var(--serif);
+  font-weight:    300;
+  font-size:      clamp(4rem, 10vw, 9rem);
+  line-height:    0.95;
+  letter-spacing: -0.02em;
+  margin-bottom:  1.5rem;
+  animation:      fadeUp 1s 0.15s ease both;
+}
+
+h1.hero-title em {
+  font-style: italic;
+  color:      var(--green-bright);
+}
+
+.hero-sub {
+  font-family:   var(--serif);
+  font-weight:   300;
+  font-size:     1.15rem;
+  color:         var(--muted);
+  max-width:     480px;
+  margin-bottom: 3.5rem;
+  animation:     fadeUp 1s 0.3s ease both;
+}
+
+.hero-meta {
+  display:   flex;
+  gap:       3rem;
+  animation: fadeUp 1s 0.45s ease both;
+}
+
+.hero-meta-item {
+  font-family:    var(--mono);
+  font-size:      0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.hero-meta-item span {
+  display:       block;
+  color:         var(--muted);
+  margin-bottom: 0.3rem;
+}
+
+.hero-meta-item strong {
+  color: var(--green-bright);
+}
+
+.scroll-hint {
+  position:       absolute;
+  bottom:         2.5rem;
+  left:           50%;
+  transform:      translateX(-50%);
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            0.5rem;
+  font-family:    var(--mono);
+  font-size:      0.55rem;
+  letter-spacing: 0.2em;
+  color:          var(--muted);
+  text-transform: uppercase;
+  animation:      fadeUp 1s 0.8s ease both;
+}
+
+.scroll-line {
+  width:      1px;
+  height:     50px;
+  background: linear-gradient(to bottom, var(--green-bright), transparent);
+  animation:  scrollPulse 2s ease infinite;
+}
+
+
+/* ── 11. INDEX — HEARTBEAT VISUALISER ────────────────────── */
+
+#heartbeat-vis {
+  text-align: center;
+  padding:    5rem 10vw;
+  background: linear-gradient(to bottom, var(--black), var(--deep), var(--black));
+}
+
+.heartbeat-canvas-wrap {
+  position:   relative;
+  margin:     3rem auto 0;
+  max-width:  800px;
+}
+
+canvas#hb {
+  width:   100%;
+  height:  120px;
+  display: block;
+}
+
+.hb-label {
+  font-family:    var(--mono);
+  font-size:      0.55rem;
+  letter-spacing: 0.2em;
+  color:          var(--muted);
+  margin-top:     1rem;
+  text-transform: uppercase;
+}
+
+
+/* ── 12. INDEX — SOURCES GRID ─────────────────────────────── */
+
+#sources {
+  background: var(--deep);
+}
+
+.sources-grid {
+  display:    grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:        1px;
+  background: rgba(61, 175, 110, 0.1);
+  margin-top: 3rem;
+  border:     1px solid rgba(61, 175, 110, 0.1);
+}
+
+.source-card {
+  background:  var(--deep);
+  padding:     2.5rem 2rem;
+  transition:  background 0.3s;
+}
+
+.source-card:hover {
+  background: rgba(61, 175, 110, 0.05);
+}
+
+.source-num {
+  font-family:    var(--mono);
+  font-size:      0.55rem;
+  letter-spacing: 0.2em;
+  color:          var(--green);
+  margin-bottom:  1rem;
+}
+
+.source-card h3 {
+  font-family:   var(--serif);
+  font-weight:   400;
+  font-size:     1.4rem;
+  margin-bottom: 0.8rem;
+}
+
+.source-card p {
+  font-size:   0.9rem;
+  color:       var(--muted);
+  line-height: 1.6;
+}
+
+.source-tag {
+  display:        inline-block;
+  margin-top:     1.2rem;
+  font-family:    var(--mono);
+  font-size:      0.5rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color:          var(--green-bright);
+  border:         1px solid var(--green);
+  padding:        0.3rem 0.7rem;
+}
+
+
+/* ── 13. INDEX — DNA SECTION ──────────────────────────────── */
+
+#dna {
+  overflow: hidden;
+}
+
+.dna-inner {
+  display:     grid;
+  grid-template-columns: 1fr 1fr;
+  gap:         5rem;
+  align-items: center;
+}
+
+.dna-text p {
+  color:         var(--muted);
+  font-size:     1.05rem;
+  margin-bottom: 1.2rem;
+}
+
+.dna-text p strong { color: var(--white); font-weight: 400; }
+
+.dna-vis {
+  position: relative;
+  height:   400px;
+}
+
+canvas#dnaCanvas {
+  width:  100%;
+  height: 100%;
+}
+
+
+/* ── 14. INDEX — MUSIC SECTION ────────────────────────────── */
+
+#music {
+  background: var(--deep);
+}
+
+.music-pieces {
+  display:               grid;
+  grid-template-columns: 1fr 1fr;
+  gap:                   2rem;
+  margin-top:            3rem;
+}
+
+.music-piece {
+  border:     1px solid rgba(61, 175, 110, 0.15);
+  padding:    2.5rem;
+  position:   relative;
+  overflow:   hidden;
+  transition: border-color 0.3s;
+}
+
+.music-piece:hover {
+  border-color: var(--green);
+}
+
+.music-piece::before {
+  content:    '';
+  position:   absolute;
+  top: 0; left: 0; right: 0;
+  height:     1px;
+  background: linear-gradient(to right, var(--green-bright), transparent);
+  opacity:    0;
+  transition: opacity 0.3s;
+}
+
+.music-piece:hover::before {
+  opacity: 1;
+}
+
+.music-piece-num {
+  font-family:  var(--mono);
+  font-size:    3rem;
+  font-weight:  700;
+  color:        rgba(61, 175, 110, 0.08);
+  position:     absolute;
+  top:          1rem;
+  right:        1.5rem;
+  line-height:  1;
+}
+
+.music-piece h3 {
+  font-family:   var(--serif);
+  font-size:     1.5rem;
+  font-weight:   400;
+  margin-bottom: 0.3rem;
+}
+
+.music-piece .composer {
+  font-family:    var(--mono);
+  font-size:      0.6rem;
+  letter-spacing: 0.2em;
+  color:          var(--green-bright);
+  text-transform: uppercase;
+  margin-bottom:  1.2rem;
+}
+
+.music-piece p {
+  font-size: 0.95rem;
+  color:     var(--muted);
+}
+
+
+/* ── 15. INDEX — INSTALLATION SECTION ────────────────────── */
+
+#installation {
+  background: var(--black);
+}
+
+.install-grid {
+  display:               grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap:                   1px;
+  background:            rgba(61, 175, 110, 0.1);
+  margin-top:            3rem;
+}
+
+.install-cell {
+  background: var(--black);
+  padding:    3rem 2.5rem;
+}
+
+.install-cell h3 {
+  font-family:    var(--mono);
+  font-size:      0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color:          var(--green-bright);
+  margin-bottom:  1.5rem;
+}
+
+.install-cell p {
+  font-size:   1rem;
+  color:       var(--muted);
+  line-height: 1.8;
+}
+
+.install-cell p strong {
+  color:       var(--white);
+  font-weight: 400;
+}
+
+
+/* ── 16. INDEX — GOALS SECTION ────────────────────────────── */
+
+#goals {
+  background:  var(--deep);
+  text-align:  center;
+}
+
+.goals-list {
+  display:         flex;
+  flex-wrap:       wrap;
+  justify-content: center;
+  gap:             1rem;
+  margin-top:      3rem;
+  list-style:      none;
+}
+
+.goals-list li {
+  border:      1px solid rgba(61, 175, 110, 0.3);
+  padding:     0.8rem 1.8rem;
+  font-family: var(--serif);
+  font-size:   1.1rem;
+  font-style:  italic;
+  color:       var(--white);
+  transition:  all 0.3s;
+}
+
+.goals-list li:hover {
+  border-color: var(--green-bright);
+  background:   var(--green-glow);
+  color:        var(--green-bright);
+}
+
+
+/* ── 17. STATEMENT — PAGE HEADER ──────────────────────────── */
+
+header {
+  min-height:     60vh;
+  display:        flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding:        8rem 10vw 5rem;
+  position:       relative;
+  overflow:       hidden;
+  border-bottom:  1px solid rgba(61, 175, 110, 0.1);
+}
+
+.header-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 50% 80% at 90% 20%, rgba(45, 122, 79, 0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 30% 50% at 10% 90%, rgba(45, 122, 79, 0.04) 0%, transparent 60%);
+}
+
+.header-rule {
+  position:   absolute;
+  left:       calc(10vw - 1px);
+  top: 0; bottom: 0;
+  width:      1px;
+  background: linear-gradient(to bottom, transparent, var(--green) 30%, var(--green) 70%, transparent);
+  opacity:    0.3;
+}
+
+.header-eyebrow {
+  font-family:    var(--mono);
+  font-size:      0.6rem;
+  letter-spacing: 0.3em;
+  color:          var(--green-bright);
+  text-transform: uppercase;
+  margin-bottom:  1.5rem;
+  animation:      fadeUp 0.8s ease both;
+}
+
+h1.page-title {
+  font-family:    var(--serif);
+  font-weight:    300;
+  font-size:      clamp(2.8rem, 6vw, 6rem);
+  line-height:    1.05;
+  letter-spacing: -0.02em;
+  margin-bottom:  2rem;
+  animation:      fadeUp 0.8s 0.1s ease both;
+}
+
+h1.page-title em {
+  font-style: italic;
+  color:      var(--green-bright);
+}
+
+.header-meta {
+  display:   flex;
+  gap:       3rem;
+  flex-wrap: wrap;
+  animation: fadeUp 0.8s 0.2s ease both;
+}
+
+.meta-item {
+  font-family:    var(--mono);
+  font-size:      0.58rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.meta-item span {
+  display:       block;
+  color:         var(--muted);
+  margin-bottom: 0.25rem;
+}
+
+.meta-item strong {
+  color: var(--white);
+}
+
+
+/* ── 18. STATEMENT — ARTICLE / SIDEBAR LAYOUT ─────────────── */
+
+.page-body {
+  display:               grid;
+  grid-template-columns: 1fr 280px;
+  gap:                   0;
+  max-width:             1300px;
+  margin:                0 auto;
+  padding:               0 10vw;
+  align-items:           start;
+}
+
+article {
+  padding:      5rem 4rem 8rem 0;
+  border-right: 1px solid rgba(61, 175, 110, 0.08);
+}
+
+aside {
+  padding:  5rem 0 5rem 3rem;
+  position: sticky;
+  top:      5rem;
+}
+
+
+/* ── 19. STATEMENT — ARTICLE TYPOGRAPHY ───────────────────── */
+
+.article-section {
+  margin-bottom: 4rem;
+}
+
+.article-section-label {
+  font-family:    var(--mono);
+  font-size:      0.55rem;
+  letter-spacing: 0.3em;
+  color:          var(--green);
+  text-transform: uppercase;
+  margin-bottom:  1.2rem;
+  display:        flex;
+  align-items:    center;
+  gap:            0.8rem;
+}
+
+.article-section-label::before {
+  content:    '';
+  width:      20px;
+  height:     1px;
+  background: var(--green);
+}
+
+h2.article-h2 {
+  font-family:    var(--serif);
+  font-weight:    300;
+  font-size:      clamp(1.8rem, 3vw, 2.6rem);
+  line-height:    1.15;
+  margin-bottom:  1.5rem;
+  letter-spacing: -0.01em;
+}
+
+h2.article-h2 em {
+  font-style: italic;
+  color:      var(--green-bright);
+}
+
+.article-body p {
+  color:         var(--muted);
+  margin-bottom: 1.4rem;
+  font-size:     1.05rem;
+}
+
+.article-body p strong { color: var(--white);  font-weight: 400; }
+.article-body p em     { font-style: italic; color: var(--white); }
+
+.pull-quote {
+  margin:     3rem 0;
+  padding:    2rem 2.5rem;
+  border-left: 2px solid var(--green-bright);
+  background: var(--green-glow);
+}
+
+.pull-quote p {
+  font-size:  1.45rem;
+  font-style: italic;
+  color:      var(--white);
+  line-height: 1.4;
+  margin:     0;
+}
+
+.back-link {
+  display:        inline-flex;
+  align-items:    center;
+  gap:            0.6rem;
+  font-family:    var(--mono);
+  font-size:      0.58rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color:          var(--muted);
+  text-decoration: none;
+  transition:     color 0.2s;
+  margin-bottom:  3rem;
+}
+
+.back-link:hover { color: var(--green-bright); }
+
+.back-link svg {
+  width:      14px;
+  transition: transform 0.2s;
+}
+
+.back-link:hover svg {
+  transform: translateX(-3px);
+}
+
+
+/* ── 20. STATEMENT — VIDEO EMBED ──────────────────────────── */
+
+.video-section {
+  margin: 3.5rem 0;
+}
+
+.video-label {
+  font-family:    var(--mono);
+  font-size:      0.55rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color:          var(--green-bright);
+  margin-bottom:  1rem;
+  display:        flex;
+  align-items:    center;
+  gap:            0.8rem;
+}
+
+.video-label::before {
+  content:    '';
+  width:      20px;
+  height:     1px;
+  background: var(--green);
+}
+
+.video-wrapper {
+  position:       relative;
+  padding-bottom: 56.25%; /* 16:9 */
+  height:         0;
+  overflow:       hidden;
+  background:     var(--deep);
+  border:         1px solid rgba(61, 175, 110, 0.2);
+}
+
+.video-wrapper iframe {
+  position: absolute;
+  top: 0; left: 0;
+  width:  100%;
+  height: 100%;
+  border: 0;
+}
+
+.video-placeholder {
+  position:        absolute;
+  inset:           0;
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  justify-content: center;
+  gap:             1rem;
+  background:      var(--deep);
+}
+
+.video-placeholder .ph-icon {
+  width:           56px;
+  height:          56px;
+  border:          1px solid var(--green);
+  border-radius:   50%;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+}
+
+.video-placeholder .ph-icon svg {
+  width: 20px;
+  fill:  var(--green-bright);
+}
+
+.video-placeholder p {
+  font-family:    var(--mono);
+  font-size:      0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color:          var(--muted);
+  text-align:     center;
+  margin:         0;
+}
+
+.video-placeholder a {
+  font-family:     var(--mono);
+  font-size:       0.58rem;
+  letter-spacing:  0.15em;
+  color:           var(--green-bright);
+  text-transform:  uppercase;
+  text-decoration: none;
+  border-bottom:   1px solid var(--green);
+  padding-bottom:  2px;
+}
+
+.video-caption {
+  margin-top:     0.8rem;
+  font-family:    var(--mono);
+  font-size:      0.55rem;
+  letter-spacing: 0.1em;
+  color:          var(--muted);
+  text-transform: uppercase;
+}
+
+
+/* ── 21. STATEMENT — SIDEBAR COMPONENTS ───────────────────── */
+
+.aside-block {
+  margin-bottom: 3rem;
+}
+
+.aside-label {
+  font-family:    var(--mono);
+  font-size:      0.55rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color:          var(--green);
+  margin-bottom:  1rem;
+  padding-bottom: 0.6rem;
+  border-bottom:  1px solid rgba(61, 175, 110, 0.15);
+}
+
+.toc {
+  list-style: none;
+}
+
+.toc li {
+  margin-bottom: 0.5rem;
+}
+
+.toc a {
+  font-family:     var(--mono);
+  font-size:       0.6rem;
+  letter-spacing:  0.1em;
+  color:           var(--muted);
+  text-decoration: none;
+  text-transform:  uppercase;
+  transition:      color 0.2s;
+  display:         flex;
+  align-items:     center;
+  gap:             0.6rem;
+}
+
+.toc a::before {
+  content:    '';
+  width:      12px;
+  height:     1px;
+  background: currentColor;
+  flex-shrink: 0;
+  transition:  width 0.2s;
+}
+
+.toc a:hover,
+.toc a.active {
+  color: var(--green-bright);
+}
+
+.toc a:hover::before {
+  width: 20px;
+}
+
+.key-terms {
+  list-style: none;
+}
+
+.key-terms li {
+  margin-bottom:  1rem;
+  padding-bottom: 1rem;
+  border-bottom:  1px solid rgba(61, 175, 110, 0.08);
+}
+
+.key-terms li:last-child {
+  border-bottom: none;
+}
+
+.key-term-word {
+  font-family:    var(--mono);
+  font-size:      0.6rem;
+  letter-spacing: 0.15em;
+  color:          var(--green-bright);
+  text-transform: uppercase;
+  display:        block;
+  margin-bottom:  0.3rem;
+}
+
+.key-terms li p {
+  font-size:   0.85rem;
+  color:       var(--muted);
+  line-height: 1.5;
+  margin:      0;
+}
+
+
+/* ── 22. RESPONSIVE ───────────────────────────────────────── */
+
+@media (max-width: 960px) {
+  /* Statement layout */
+  .page-body {
+    grid-template-columns: 1fr;
+    padding: 0 6vw;
+  }
+  article {
+    padding:       4rem 0 5rem;
+    border-right:  none;
+    border-bottom: 1px solid rgba(61, 175, 110, 0.08);
+  }
+  aside {
+    position: static;
+    padding:  3rem 0;
+  }
+
+  /* Sources grid: 3 → 1 col */
+  .sources-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* DNA and About: side-by-side → stacked */
+  #about,
+  .dna-inner {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  /* Music and Install: 2 → 1 col */
+  .music-pieces,
+  .install-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Nav */
+  nav {
+    padding: 1.2rem 1.5rem;
+  }
+  .nav-links {
+    gap: 1.2rem;
+  }
+
+  /* Sections */
+  section {
+    padding: 5rem 6vw;
+  }
+
+  /* Footer */
+  footer {
+    flex-direction: column;
+    gap:            1.5rem;
+    text-align:     center;
+  }
+  .footer-meta {
+    text-align: center;
+  }
+}
