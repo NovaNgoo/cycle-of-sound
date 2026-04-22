@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cycles of Sound — Ngo Tuan Khoi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #060608;
+      --deep: #0a0a0f;
+      --green: #2d7a4f;
+      --green-bright: #3daf6e;
+      --green-glow: rgba(61, 175, 110, 0.15);
+      --white: #e8e4dc;
+      --muted: #7a7870;
+      --mono: 'Space Mono', monospace;
+      --serif: 'Cormorant Garamond', serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: var(--serif);
+      font-size: 18px;
+      line-height: 1.7;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      position: fixed;
+      width: 8px; height: 8px;
+      background: var(--green-bright);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.2s, height 0.2s, opacity 0.2s;
+      mix-blend-mode: screen;
+    }
+    .cursor-ring {
+      position: fixed;
+      width: 36px; height: 36px;
+      border: 1px solid rgba(61, 175, 110, 0.5);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: all 0.12s ease;
+    }
+
+    /* Noise overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.4;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem 3rem;
+      background: linear-gradient(to bottom, rgba(6,6,8,0.95) 0%, transparent 100%);
+    }
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: var(--green-bright);
+      text-transform: uppercase;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: var(--green-bright); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 0 10vw;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 80% 50%, rgba(45, 122, 79, 0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 20% 80%, rgba(45, 122, 79, 0.05) 0%, transparent 60%);
+    }
+
+    /* Waveform lines */
+    .waveform-bg {
+      position: absolute;
+      bottom: 15%;
+      left: 0; right: 0;
+      height: 120px;
+      opacity: 0.12;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      color: var(--green-bright);
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+      animation: fadeUp 1s ease both;
+    }
+
+    h1.hero-title {
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: clamp(4rem, 10vw, 9rem);
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+      animation: fadeUp 1s 0.15s ease both;
+    }
+    h1.hero-title em {
+      font-style: italic;
+      color: var(--green-bright);
+    }
+
+    .hero-sub {
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 480px;
+      margin-bottom: 3.5rem;
+      animation: fadeUp 1s 0.3s ease both;
+    }
+
+    .hero-meta {
+      display: flex;
+      gap: 3rem;
+      animation: fadeUp 1s 0.45s ease both;
+    }
+    .hero-meta-item {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+    .hero-meta-item span {
+      display: block;
+      color: var(--muted);
+      margin-bottom: 0.3rem;
+    }
+    .hero-meta-item strong { color: var(--green-bright); }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--mono);
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+      animation: fadeUp 1s 0.8s ease both;
+    }
+    .scroll-line {
+      width: 1px;
+      height: 50px;
+      background: linear-gradient(to bottom, var(--green-bright), transparent);
+      animation: scrollPulse 2s ease infinite;
+    }
+
+    /* ── SECTION BASE ── */
+    section {
+      padding: 7rem 10vw;
+      position: relative;
+    }
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      color: var(--green-bright);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      max-width: 60px;
+      height: 1px;
+      background: var(--green);
+    }
+
+    h2.section-title {
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      line-height: 1.1;
+      margin-bottom: 2.5rem;
+    }
+    h2.section-title em { font-style: italic; color: var(--green-bright); }
+
+    /* ── ABOUT / CONCEPT ── */
+    #about {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: start;
+    }
+    .about-text p {
+      color: var(--muted);
+      margin-bottom: 1.2rem;
+      font-size: 1.05rem;
+    }
+    .about-text p strong { color: var(--white); font-weight: 400; }
+
+    .about-quote {
+      border-left: 1px solid var(--green);
+      padding-left: 2rem;
+      margin-top: 2rem;
+    }
+    .about-quote blockquote {
+      font-size: 1.5rem;
+      font-style: italic;
+      font-weight: 300;
+      line-height: 1.4;
+      color: var(--white);
+    }
+    .about-quote cite {
+      display: block;
+      margin-top: 1rem;
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      color: var(--green-bright);
+      font-style: normal;
+    }
+
+    /* ── HEARTBEAT VISUALISER ── */
+    #heartbeat-vis {
+      text-align: center;
+      padding: 5rem 10vw;
+      background: linear-gradient(to bottom, var(--black), var(--deep), var(--black));
+    }
+    .heartbeat-canvas-wrap {
+      position: relative;
+      margin: 3rem auto 0;
+      max-width: 800px;
+    }
+    canvas#hb {
+      width: 100%;
+      height: 120px;
+      display: block;
+    }
+    .hb-label {
+      font-family: var(--mono);
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      margin-top: 1rem;
+      text-transform: uppercase;
+    }
+
+    /* ── SOURCES GRID ── */
+    #sources {
+      background: var(--deep);
+    }
+    .sources-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: rgba(61,175,110,0.1);
+      margin-top: 3rem;
+      border: 1px solid rgba(61,175,110,0.1);
+    }
+    .source-card {
+      background: var(--deep);
+      padding: 2.5rem 2rem;
+      transition: background 0.3s;
+    }
+    .source-card:hover { background: rgba(61,175,110,0.05); }
+    .source-num {
+      font-family: var(--mono);
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      color: var(--green);
+      margin-bottom: 1rem;
+    }
+    .source-card h3 {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: 1.4rem;
+      margin-bottom: 0.8rem;
+    }
+    .source-card p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .source-tag {
+      display: inline-block;
+      margin-top: 1.2rem;
+      font-family: var(--mono);
+      font-size: 0.5rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--green-bright);
+      border: 1px solid var(--green);
+      padding: 0.3rem 0.7rem;
+    }
+
+    /* ── DNA SECTION ── */
+    #dna {
+      overflow: hidden;
+    }
+    .dna-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+    .dna-text p {
+      color: var(--muted);
+      font-size: 1.05rem;
+      margin-bottom: 1.2rem;
+    }
+    .dna-text p strong { color: var(--white); font-weight: 400; }
+
+    .dna-vis {
+      position: relative;
+      height: 400px;
+    }
+    canvas#dnaCanvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ── MUSIC SECTION ── */
+    #music {
+      background: var(--deep);
+    }
+    .music-pieces {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+    .music-piece {
+      border: 1px solid rgba(61,175,110,0.15);
+      padding: 2.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+    .music-piece:hover { border-color: var(--green); }
+    .music-piece::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(to right, var(--green-bright), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .music-piece:hover::before { opacity: 1; }
+    .music-piece-num {
+      font-family: var(--mono);
+      font-size: 3rem;
+      font-weight: 700;
+      color: rgba(61,175,110,0.08);
+      position: absolute;
+      top: 1rem; right: 1.5rem;
+      line-height: 1;
+    }
+    .music-piece h3 {
+      font-family: var(--serif);
+      font-size: 1.5rem;
+      font-weight: 400;
+      margin-bottom: 0.3rem;
+    }
+    .music-piece .composer {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      color: var(--green-bright);
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+    }
+    .music-piece p {
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    /* ── INSTALLATION ── */
+    #installation {
+      background: var(--black);
+    }
+    .install-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      background: rgba(61,175,110,0.1);
+      margin-top: 3rem;
+    }
+    .install-cell {
+      background: var(--black);
+      padding: 3rem 2.5rem;
+    }
+    .install-cell h3 {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--green-bright);
+      margin-bottom: 1.5rem;
+    }
+    .install-cell p {
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+    .install-cell p strong { color: var(--white); font-weight: 400; }
+
+    /* ── GOALS ── */
+    #goals {
+      background: var(--deep);
+      text-align: center;
+    }
+    .goals-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 3rem;
+      list-style: none;
+    }
+    .goals-list li {
+      border: 1px solid rgba(61,175,110,0.3);
+      padding: 0.8rem 1.8rem;
+      font-family: var(--serif);
+      font-size: 1.1rem;
+      font-style: italic;
+      color: var(--white);
+      transition: all 0.3s;
+    }
+    .goals-list li:hover {
+      border-color: var(--green-bright);
+      background: var(--green-glow);
+      color: var(--green-bright);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 4rem 10vw;
+      border-top: 1px solid rgba(61,175,110,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer-name {
+      font-family: var(--serif);
+      font-size: 1.2rem;
+      font-weight: 300;
+    }
+    .footer-meta {
+      font-family: var(--mono);
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+      text-align: right;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes scrollPulse {
+      0%,100% { opacity: 0.4; }
+      50%      { opacity: 1; }
+    }
+
+    /* Fade-in on scroll */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      #about, .dna-inner { grid-template-columns: 1fr; gap: 3rem; }
+      .sources-grid, .music-pieces, .install-grid { grid-template-columns: 1fr; }
+      nav { padding: 1.2rem 1.5rem; }
+      .nav-links { gap: 1.2rem; }
+      section { padding: 5rem 6vw; }
+      footer { flex-direction: column; gap: 1.5rem; text-align: center; }
+      .footer-meta { text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cursor -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- Nav -->
+  <nav>
+    <div class="nav-logo">C / O / S</div>
+    <ul class="nav-links">
+      <li><a href="#about">Concept</a></li>
+      <li><a href="#sources">Artists</a></li>
+      <li><a href="#dna">DNA</a></li>
+      <li><a href="#music">Music</a></li>
+      <li><a href="#installation">Installation</a></li>
+    </ul>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section id="hero">
+    <div class="hero-bg"></div>
+    <svg class="waveform-bg" viewBox="0 0 1200 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <polyline points="0,60 40,60 50,20 60,100 70,40 80,80 100,60 150,60 160,30 175,90 190,50 210,70 230,60 300,60 310,10 325,110 340,45 355,80 370,55 400,60 450,60 465,25 475,95 490,40 505,75 525,60 600,60 620,15 635,105 650,38 665,85 685,60 750,60 770,30 785,90 800,42 820,75 840,60 900,60 920,20 940,100 960,50 980,78 1000,60 1100,60 1115,35 1130,85 1145,50 1160,72 1200,60"
+        fill="none" stroke="#3daf6e" stroke-width="1.5"/>
+    </svg>
+
+    <div class="hero-eyebrow">A Visual Sound Installation</div>
+    <h1 class="hero-title">Cycles<br>of <em>Sound</em></h1>
+    <p class="hero-sub">Where the repeating patterns of nature — DNA, heartbeats, seasons — become music.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item"><span>Artist</span><strong>Ngo Tuan Khoi</strong></div>
+      <div class="hero-meta-item"><span>Medium</span><strong>Audio · Visual · Installation</strong></div>
+      <div class="hero-meta-item"><span>Theme</span><strong>Cycles &amp; Repetition</strong></div>
+    </div>
+    <div class="scroll-hint">
+      <div class="scroll-line"></div>
+      Scroll
+    </div>
+  </section>
+
+  <!-- ── ABOUT ── -->
+  <section id="about">
+    <div class="about-text reveal">
+      <div class="section-label">01 — Concept</div>
+      <h2 class="section-title">Sound is<br><em>never still</em></h2>
+      <p>This project explores the idea that <strong>cycles are embedded in everything</strong> — from the rhythm of a heartbeat to the repeating base pairs of DNA, from the pattern of rain on a drum to the seasons cycling through a year.</p>
+      <p>Rather than treating sound as a product of instruments alone, this installation asks: <strong>what if every cycle in nature is already music?</strong></p>
+      <p>Inspired by soundscape ecologist Bernie Krause's concept of biophony, and the visual works of Hiroshi Sugimoto, the project seeks to make the invisible audible — to give form to repetition itself.</p>
+    </div>
+    <div class="reveal" style="transition-delay:0.2s">
+      <div class="about-quote">
+        <blockquote>"There's no separation between sound and visuals."</blockquote>
+        <cite>— Ryoji Ikeda</cite>
+      </div>
+      <div class="about-quote" style="margin-top:2.5rem">
+        <blockquote>"Natural environments behave like musical compositions, where every species contributes a repeating, cyclical rhythm."</blockquote>
+        <cite>— Bernie Krause, Soundscape Ecologist</cite>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── HEARTBEAT VISUALISER ── -->
+  <section id="heartbeat-vis" style="padding:5rem 10vw">
+    <div class="reveal" style="text-align:center">
+      <div class="section-label" style="justify-content:center">02 — The Pulse</div>
+      <h2 class="section-title" style="text-align:center">Everything begins with a <em>heartbeat</em></h2>
+      <p style="color:var(--muted);max-width:500px;margin:0 auto;font-size:1rem;">
+        The heart's pumping cycle produces vibrations in patterns that mirror our emotional state — fast with excitement, slow with calm.
+      </p>
+    </div>
+    <div class="heartbeat-canvas-wrap reveal" style="transition-delay:0.3s">
+      <canvas id="hb"></canvas>
+      <div class="hb-label">Live ECG simulation — the foundation of the installation's audio loop</div>
+    </div>
+  </section>
+
+  <!-- ── SOURCES / ARTISTS ── -->
+  <section id="sources">
+    <div class="reveal">
+      <div class="section-label">03 — Artistic Influences</div>
+      <h2 class="section-title">The artists who<br>shaped this <em>work</em></h2>
+    </div>
+    <div class="sources-grid">
+      <div class="source-card reveal">
+        <div class="source-num">Artist 01</div>
+        <h3>Bernie Krause</h3>
+        <p>Soundscape ecologist who spent 50+ years recording natural environments. He coined <em>biophony</em> (collective animal sound), <em>geophony</em> (natural non-animal sound), and <em>anthropophony</em> (human-created sound). His insight: nature itself composes.</p>
+        <span class="source-tag">Soundscape Ecology</span>
+      </div>
+      <div class="source-card reveal" style="transition-delay:0.1s">
+        <div class="source-num">Artist 02</div>
+        <h3>Hiroshi Sugimoto</h3>
+        <p>Japanese photographer who depicted cycles of nature through long exposures — tides, day to night, endless waves. His monochrome images each carry a subtle rhythm; you feel you can almost hear them.</p>
+        <span class="source-tag">Photography · Cycles</span>
+      </div>
+      <div class="source-card reveal" style="transition-delay:0.2s">
+        <div class="source-num">Artist 03</div>
+        <h3>Ryoji Ikeda</h3>
+        <p>Japanese artist who transforms sound, light, and raw data into stark immersive environments. He uses ultrasonic frequencies and high-contrast digital imagery to push the limits of perception. Technology serves the concept — never the other way around.</p>
+        <span class="source-tag">Data · Audio Visual</span>
+      </div>
+      <div class="source-card reveal" style="transition-delay:0.1s">
+        <div class="source-num">Artist 04</div>
+        <h3>Refik Anadol</h3>
+        <p>Media artist who transforms real-world datasets — sound recordings, weather patterns, brain signals — into living visual installations using AI and machine learning. His work explores memory, time, and the cycle of data.</p>
+        <span class="source-tag">AI · Generative Art</span>
+      </div>
+      <div class="source-card reveal" style="transition-delay:0.2s">
+        <div class="source-num">Artist 05</div>
+        <h3>Stanley Kubrick</h3>
+        <p><em>2001: A Space Odyssey</em> uses long silences, minimal dialogue, and visually hypnotic sequences to produce psychedelic experience. The film was a primary influence for recreating its sensory effects through audio.</p>
+        <span class="source-tag">Cinema · Psychedelia</span>
+      </div>
+      <div class="source-card reveal" style="transition-delay:0.3s">
+        <div class="source-num">Artist 06</div>
+        <h3>Andy Warhol</h3>
+        <p><em>Marilyn Diptych</em> — repeated images shifting through colour — creates a trance-like rhythm that echoes psychedelic experience while critiquing mass media and celebrity culture. Repetition as meaning-making.</p>
+        <span class="source-tag">Pop Art · Repetition</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── DNA ── -->
+  <section id="dna">
+    <div class="dna-inner">
+      <div class="dna-text reveal">
+        <div class="section-label">04 — The DNA Idea</div>
+        <h2 class="section-title">Translating<br>life into <em>music</em></h2>
+        <p>DNA is perhaps the most fundamental cycle in all of biology — four bases (A, T, C, G) repeating in patterns that encode every living thing.</p>
+        <p>The core idea of this project: <strong>map each DNA base to a musical note</strong>, and let the sequence of life itself become a progression of sound.</p>
+        <p>With the help of AI to translate the genetic code into actual notes, played by virtual instruments and layered into the final installation audio — the project becomes a literal translation of biology into music.</p>
+        <p style="font-style:italic;color:var(--green-bright)">A — T — C — G become notes in an infinite biological score.</p>
+      </div>
+      <div class="dna-vis reveal" style="transition-delay:0.2s">
+        <canvas id="dnaCanvas"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── MUSIC ── -->
+  <section id="music">
+    <div class="reveal">
+      <div class="section-label">05 — Musical References</div>
+      <h2 class="section-title">Compositions that<br>live in <em>cycles</em></h2>
+    </div>
+    <div class="music-pieces">
+      <div class="music-piece reveal">
+        <div class="music-piece-num">01</div>
+        <h3>Boléro</h3>
+        <div class="composer">Maurice Ravel · 1928</div>
+        <p>Built almost entirely on one rhythmic snare pattern — a mechanical clock of sound. Repetition is the architecture, the melody, and the drama. An entire piece that is one single cycle, growing.</p>
+      </div>
+      <div class="music-piece reveal" style="transition-delay:0.1s">
+        <div class="music-piece-num">02</div>
+        <h3>The Four Seasons</h3>
+        <div class="composer">Antonio Vivaldi · 1725</div>
+        <p>Recurring ritornello themes return throughout each concerto, mirroring the seasonal cycles of Earth. Nature encoded as structure in music — the concept of this project in classical form.</p>
+      </div>
+      <div class="music-piece reveal" style="transition-delay:0.15s">
+        <div class="music-piece-num">03</div>
+        <h3>Symphony No. 9</h3>
+        <div class="composer">Ludwig van Beethoven · 1824</div>
+        <p>Cyclic motifs recurring across all four movements, culminating in the Ode to Joy. The brain recognises the pattern and rewards itself with dopamine — repetition as neurological pleasure.</p>
+      </div>
+      <div class="music-piece reveal" style="transition-delay:0.2s">
+        <div class="music-piece-num">04</div>
+        <h3>The Dark Side of the Moon</h3>
+        <div class="composer">Pink Floyd · 1973</div>
+        <p>Cycles of recurring elements throughout — including the heartbeat that opens and closes the album. The primary sonic reference for this installation: spatial audio, sensory overload, and the out-of-body experience of listening.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── INSTALLATION ── -->
+  <section id="installation">
+    <div class="reveal">
+      <div class="section-label">06 — The Installation</div>
+      <h2 class="section-title">Concept: The<br><em>Heartbeat</em> Room</h2>
+    </div>
+    <div class="install-grid">
+      <div class="install-cell reveal">
+        <h3>Design</h3>
+        <p>A <strong>small dark room</strong> with a tight-shut door filtering outside sound. At centre: a screen playing the video on an endless loop. Side panels project <strong>long rays of light</strong> into the room's corners, shaped by fog machines into tangible straight lines you can reach through.</p>
+      </div>
+      <div class="install-cell reveal" style="transition-delay:0.1s">
+        <h3>Audio</h3>
+        <p>Begins with a <strong>calm heartbeat</strong>. Sounds of laughter, nature, and analogue DNA beeps layer in, creating hypnotic, overwhelming presence. Sounds mix and loop, end to end — surprising yet predictable. The audio fades back to the heartbeat and the cycle begins again.</p>
+      </div>
+      <div class="install-cell reveal" style="transition-delay:0.15s">
+        <h3>Visual</h3>
+        <p><strong>Altered footage</strong> of Earth's events — monochrome water flowing through lakes and waterfalls, transitioning into vibrant colour as human life and greenery appear. The video loops seamlessly, beginning and ending without a visible seam.</p>
+      </div>
+      <div class="install-cell reveal" style="transition-delay:0.2s">
+        <h3>Feeling Conveyed</h3>
+        <p>The slow pull into <strong>the strings of life itself</strong>. Birds and waterfalls heard while images shift. The brain rewards pattern recognition. The heartbeat of the video synchronises with the viewer's — calm yet alive. The world is endless and cyclic.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── GOALS ── -->
+  <section id="goals">
+    <div class="reveal">
+      <div class="section-label" style="justify-content:center">07 — Goals</div>
+      <h2 class="section-title">What this project <em>seeks</em></h2>
+    </div>
+    <ul class="goals-list reveal" style="transition-delay:0.2s">
+      <li>Relate Audio to Visuals through cycles</li>
+      <li>Draw from Nature, Space &amp; People</li>
+      <li>Translate DNA sequences into art</li>
+      <li>Create a seamlessly looping video</li>
+      <li>Cause sensory overload through sound</li>
+      <li>Make technology invisible to the concept</li>
+    </ul>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="footer-name">Ngo Tuan Khoi</div>
+    <div class="footer-meta">
+      Cycles of Sound<br>
+      Audio · Visual · Installation<br>
+      2026
+    </div>
+  </footer>
+
+  <script>
+    // ── Cursor ──
+    const cursor = document.getElementById('cursor');
+    const ring   = document.getElementById('cursorRing');
+    let mx=0, my=0, rx=0, ry=0;
+    document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cursor.style.left=mx+'px'; cursor.style.top=my+'px'; });
+    (function animateRing() {
+      rx += (mx-rx)*0.12; ry += (my-ry)*0.12;
+      ring.style.left=rx+'px'; ring.style.top=ry+'px';
+      requestAnimationFrame(animateRing);
+    })();
+
+    // ── Scroll reveal ──
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+    // ── Heartbeat Canvas ──
+    (function() {
+      const canvas = document.getElementById('hb');
+      const ctx = canvas.getContext('2d');
+      let w, h, t=0;
+      function resize() { w=canvas.width=canvas.offsetWidth*2; h=canvas.height=240; }
+      resize();
+      window.addEventListener('resize', resize);
+
+      function ecgY(x) {
+        const period = 200;
+        const phase  = (x % period) / period;
+        if      (phase < 0.35) return 0;
+        else if (phase < 0.42) return -Math.sin((phase-0.35)/0.07*Math.PI)*0.15;
+        else if (phase < 0.46) return  Math.sin((phase-0.42)/0.04*Math.PI)*1.0;
+        else if (phase < 0.50) return -Math.sin((phase-0.46)/0.04*Math.PI)*0.35;
+        else if (phase < 0.55) return  Math.sin((phase-0.50)/0.05*Math.PI)*0.08;
+        else return 0;
+      }
+
+      function draw() {
+        ctx.clearRect(0,0,w,h);
+        const mid = h/2;
+        const amp = h*0.38;
+
+        // glow
+        ctx.shadowColor = '#3daf6e';
+        ctx.shadowBlur  = 12;
+        ctx.strokeStyle = '#3daf6e';
+        ctx.lineWidth   = 2.5;
+        ctx.beginPath();
+        for(let px=0; px<w; px++) {
+          const xPhase = px + t;
+          const y = mid + ecgY(xPhase) * amp;
+          px===0 ? ctx.moveTo(px,y) : ctx.lineTo(px,y);
+        }
+        ctx.stroke();
+        ctx.shadowBlur=0;
+
+        // dim trailing line
+        ctx.strokeStyle='rgba(61,175,110,0.1)';
+        ctx.lineWidth=1;
+        ctx.beginPath();
+        ctx.moveTo(0,mid); ctx.lineTo(w,mid);
+        ctx.stroke();
+
+        t -= 2.5;
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+
+    // ── DNA helix canvas ──
+    (function() {
+      const canvas = document.getElementById('dnaCanvas');
+      if(!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let w, h, t=0;
+      function resize() { w=canvas.width=canvas.offsetWidth*2||600; h=canvas.height=canvas.offsetHeight*2||800; }
+      resize();
+      window.addEventListener('resize', resize);
+
+      const bases = ['A','T','C','G'];
+      const colors = { A:'#3daf6e', T:'#2d7a4f', C:'#7a7870', G:'#e8e4dc' };
+
+      function draw() {
+        ctx.clearRect(0,0,w,h);
+        const cx = w/2, numPairs=16, pairH=h/numPairs;
+
+        for(let i=0;i<numPairs;i++) {
+          const y     = i*pairH + (t%pairH);
+          const angle = (i/numPairs)*Math.PI*2 + t*0.015;
+          const wave  = Math.sin(angle)*cx*0.3;
+
+          const x1 = cx + wave;
+          const x2 = cx - wave;
+          const base1 = bases[i%4];
+          const base2 = bases[(i+2)%4]; // complementary
+
+          // connector
+          ctx.strokeStyle='rgba(61,175,110,0.15)';
+          ctx.lineWidth=1;
+          ctx.beginPath(); ctx.moveTo(x1,y); ctx.lineTo(x2,y); ctx.stroke();
+
+          // left node
+          ctx.beginPath();
+          ctx.arc(x1,y,8,0,Math.PI*2);
+          ctx.fillStyle=colors[base1];
+          ctx.shadowColor=colors[base1]; ctx.shadowBlur=10;
+          ctx.fill(); ctx.shadowBlur=0;
+
+          // right node
+          ctx.beginPath();
+          ctx.arc(x2,y,8,0,Math.PI*2);
+          ctx.fillStyle=colors[base2];
+          ctx.shadowColor=colors[base2]; ctx.shadowBlur=10;
+          ctx.fill(); ctx.shadowBlur=0;
+
+          // labels
+          ctx.font=`bold ${Math.round(w*0.018)}px Space Mono, monospace`;
+          ctx.fillStyle=colors[base1]; ctx.textAlign='center';
+          ctx.fillText(base1,x1,y-14);
+          ctx.fillStyle=colors[base2];
+          ctx.fillText(base2,x2,y-14);
+        }
+
+        // strand curves
+        ctx.shadowColor='#3daf6e'; ctx.shadowBlur=8;
+        ctx.strokeStyle='rgba(61,175,110,0.4)';
+        ctx.lineWidth=2;
+        for(const side of [1,-1]) {
+          ctx.beginPath();
+          for(let py=0;py<h;py+=3) {
+            const a=(py/h)*Math.PI*4+t*0.015;
+            const px=cx+Math.sin(a)*cx*0.3*side;
+            py===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+          }
+          ctx.stroke();
+        }
+        ctx.shadowBlur=0;
+
+        t+=1;
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+  </script>
+</body>
+</html>
